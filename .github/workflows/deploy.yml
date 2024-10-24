@@ -1,0 +1,27 @@
+name: Deploy to mnl Server
+
+on:
+  push:
+    branches:
+      - deploy-vps
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Deploy to server
+        run: |
+          scp -P 7058 -r ./* root@${{ secrets.SERVER_IP }}:/app/llmproxy/
+          ssh -p 7058 root@${{ secrets.SERVER_IP }} << EOF
+            cd /app/llmproxy/
+            docker-compose up -d --build
+          EOF
