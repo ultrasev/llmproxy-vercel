@@ -10,15 +10,18 @@ app = FastAPI()
 
 app.include_router(hello_router, prefix="/hello")
 app.include_router(gemini_router, prefix="/gemini")
-app.include_router(generic_router, prefix="") # put generic last
+app.include_router(generic_router, prefix="")  # put generic last
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=[ "X-Experimental-Stream-Data"],  # this is needed for streaming data header to be read by the client
+    # this is needed for streaming data header to be read by the client
+    expose_headers=["X-Experimental-Stream-Data"],
 )
+
 
 @app.get("/")
 def _root():
